@@ -1,0 +1,152 @@
+<!-- Feel free to change the content of this page to your liking (Jack 27/04/25)-->
+{% extends"base.html" %} {% block title %}Contact{% endblock %} {% block content
+%}
+<!-- Hero Section -->
+<div class="hero-section contact-hero" data-aos="fade-up">
+  <div class="container">
+    <h1>Contact Us</h1>
+    <p>
+      Get in touch with our team for any questions, support, or collaboration
+      opportunities.
+    </p>
+  </div>
+</div>
+
+<!-- Contact Form and Info Section -->
+<div class="contact-section">
+  <div class="row g-4">
+    <!-- Contact Form -->
+    <div class="col-lg-7" data-aos="fade-right">
+      <div class="contact-card contact-form-card">
+        <div class="contact-card-content">
+          <h3 class="mb-4">Send us a Message</h3>
+
+          <!-- Contact Form Starts -->
+          <form class="contact-form">
+            <div class="row g-3">
+              <!-- Full Name Field -->
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="name" class="form-label">Full Name</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="name"
+                    name="name"
+                    placeholder="John Doe"
+                    required
+                  />
+                </div>
+              </div>
+
+              <!-- Email Address Field -->
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="email" class="form-label">Email Address</label>
+                  <input
+                    type="email"
+                    class="form-control"
+                    id="email"
+                    name="email"
+                    placeholder="john@example.com"
+                    required
+                  />
+                </div>
+              </div>
+            </div>
+
+            <!-- Subject Field -->
+            <div class="mb-3">
+              <label for="subject" class="form-label">Subject</label>
+              <input
+                type="text"
+                class="form-control"
+                id="subject"
+                name="subject"
+                placeholder="How can we help?"
+                required
+              />
+            </div>
+
+            <!-- Message Field -->
+            <div class="mb-4">
+              <label for="message" class="form-label">Message</label>
+              <textarea
+                class="form-control"
+                id="message"
+                name="message"
+                rows="5"
+                placeholder="Your message here..."
+                required
+              ></textarea>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="btn btn-submit">Send Message</button>
+          </form>
+          <!-- Contact Form Ends -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Contact Info Card -->
+    <div class="col-lg-5" data-aos="fade-left">
+      <div class="contact-card contact-info-card">
+        <div class="contact-card-content">
+          <h3 class="mb-4">Connect With Us</h3>
+
+          <!-- Location Info -->
+          <div class="contact-info-item">
+            <div class="contact-info-icon">
+              <i class="fas fa-map-marker-alt"></i>
+            </div>
+            <h5>Our Location</h5>
+            <p>
+              Computing Department<br />
+              Byte.Com University<br />
+              123 Tech Street, Digital City
+            </p>
+          </div>
+
+          <!-- Email Info -->
+          <div class="contact-info-item">
+            <div class="contact-info-icon">
+              <i class="fas fa-envelope"></i>
+            </div>
+            <h5>Email Us</h5>
+            <p>
+              <a href="mailto:info@byte.com">info@byte.com</a><br />
+              <a href="mailto:support@byte.com">support@byte.com</a>
+            </p>
+          </div>
+
+          <!-- Social Media Links -->
+          <div class="contact-info-item">
+            <div class="contact-info-icon">
+              <i class="fas fa-share-alt"></i>
+            </div>
+            <h5>Our Socials</h5>
+            <div class="contact-social">
+              <a href="#" class="contact-social-link" aria-label="Discord">
+                <i class="fab fa-discord"></i>
+              </a>
+              <a href="#" class="contact-social-link" aria-label="Facebook">
+                <i class="fab fa-facebook-f"></i>
+              </a>
+              <a href="#" class="contact-social-link" aria-label="Twitter">
+                <i class="fab fa-twitter"></i>
+              </a>
+              <a href="#" class="contact-social-link" aria-label="LinkedIn">
+                <i class="fab fa-linkedin-in"></i>
+              </a>
+              <a href="#" class="contact-social-link" aria-label="Instagram">
+                <i class="fab fa-instagram"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

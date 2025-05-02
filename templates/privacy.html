@@ -1,0 +1,195 @@
+<!-- Feel free to change the content of this page to your liking (Jack 27/04/25)-->
+{% extends "base.html" %} {% block title %}Privacy Policy{% endblock %} {% block
+content %}
+<!-- Hero Section -->
+<div class="hero-section contact-hero" data-aos="fade-up">
+  <div class="container">
+    <h1>Privacy Policy</h1>
+    <p>Learn how we collect, use, and protect your personal information.</p>
+  </div>
+</div>
+
+<!-- Main Privacy Policy Content -->
+<div class="container mb-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-10">
+      <div class="privacy-card" data-aos="fade-up">
+        <!-- Privacy Policy Header -->
+        <div class="card-header">
+          <h2><i class="fas fa-shield-alt me-2"></i> Privacy Policy</h2>
+          <p class="text-muted">Last updated: 2025</p>
+        </div>
+
+        <!-- Privacy Policy Body -->
+        <div class="card-body">
+          <!-- Section 1: Information We Collect -->
+          <section class="mb-4">
+            <h3>1. Information We Collect</h3>
+            <p>
+              We collect several types of information from and about users of
+              our website, including:
+            </p>
+            <ul>
+              <li>
+                <strong>Personal Information:</strong> Name, email address,
+                payment details during registration or purchase.
+              </li>
+              <li>
+                <strong>Usage Data:</strong> Interaction details with our
+                services and website.
+              </li>
+              <li>
+                <strong>Device Information:</strong> Browser type, IP address,
+                device details.
+              </li>
+              <li>
+                <strong>Cookies:</strong> Used to enhance your user experience.
+              </li>
+            </ul>
+          </section>
+
+          <!-- Section 2: How We Use Your Information -->
+          <section class="mb-4">
+            <h3>2. How We Use Your Information</h3>
+            <p>We use collected information to:</p>
+            <ul>
+              <li>Provide, maintain, and improve our services.</li>
+              <li>Process transactions and send related information.</li>
+              <li>Send important updates or security alerts.</li>
+              <li>Respond to your comments, questions, and requests.</li>
+              <li>Analyze usage trends and activities.</li>
+              <li>
+                Personalize your experience with tailored content and offers.
+              </li>
+            </ul>
+          </section>
+
+          <!-- Section 3: Information Sharing -->
+          <section class="mb-4">
+            <h3>3. Information Sharing</h3>
+            <p>We do not sell or trade your personal information, except:</p>
+            <ul>
+              <li>To trusted partners helping us operate the website.</li>
+              <li>
+                When legally required to comply with laws or protect rights.
+              </li>
+              <li>With your explicit consent.</li>
+            </ul>
+          </section>
+
+          <!-- Section 4: Data Security -->
+          <section class="mb-4">
+            <h3>4. Data Security</h3>
+            <p>
+              We implement security measures such as encryption and secure
+              servers to protect your personal information. However, no online
+              method is 100% secure.
+            </p>
+          </section>
+
+          <!-- Section 5: Your Rights -->
+          <section class="mb-4">
+            <h3>5. Your Rights</h3>
+            <p>Depending on your location, you may have rights to:</p>
+            <ul>
+              <li>Access, correct, or delete your personal information.</li>
+              <li>Restrict or object to data processing.</li>
+              <li>Request data portability.</li>
+            </ul>
+            <p>
+              To exercise your rights, please contact us using the information
+              below.
+            </p>
+          </section>
+
+          <!-- Section 6: Children's Privacy -->
+          <section class="mb-4">
+            <h3>6. Children's Privacy</h3>
+            <p>
+              We do not knowingly collect information from children under 13. If
+              we become aware of such collection, we will promptly delete the
+              data.
+            </p>
+          </section>
+
+          <!-- Section 7: Changes to Policy -->
+          <section class="mb-4">
+            <h3>7. Changes to Our Privacy Policy</h3>
+            <p>
+              We may update this Privacy Policy occasionally. Updates will be
+              posted on this page with a new revision date.
+            </p>
+          </section>
+
+          <!-- Section 8: Contact Information -->
+          <section>
+            <h3>8. Contact Information</h3>
+            <p>
+              If you have any questions, please
+              <a href="{{ url_for('contact') }}">contact us</a>.
+            </p>
+          </section>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block extra_css %}
+<style>
+  /* 
+    ─────────────────────────────
+    Custom Styles for Privacy Page
+    ─────────────────────────────
+  */
+  /* Privacy Card Styling */
+  .privacy-card {
+    background: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+    margin-top: -50px;
+    position: relative;
+    overflow: hidden;
+    border-top: 5px solid var(--primary-color);
+  }
+
+  .privacy-card .card-header {
+    padding: 2rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  }
+
+  .privacy-card .card-header h2 {
+    color: var(--primary-color);
+    margin-bottom: 0.5rem;
+  }
+
+  .privacy-card .card-body {
+    padding: 2rem;
+  }
+
+  .privacy-card h3 {
+    color: var(--dark);
+    margin-bottom: 1rem;
+    font-weight: 600;
+  }
+
+  .privacy-card ul {
+    padding-left: 1.5rem;
+  }
+
+  .privacy-card ul li {
+    margin-bottom: 0.5rem;
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .privacy-card {
+      margin-top: 0;
+    }
+
+    .privacy-card .card-header,
+    .privacy-card .card-body {
+      padding: 1.5rem;
+    }
+  }
+</style>
+{% endblock %}

@@ -1,0 +1,111 @@
+{% extends "base.html" %} {% block title %}Courses{% endblock %} {% block
+content %}
+<div class="hero-section contact-hero" data-aos="fade-up">
+  <div class="container">
+    <h1>Our Courses</h1>
+    <p>
+      Discover our comprehensive range of technology courses designed to empower
+      your future.
+    </p>
+  </div>
+</div>
+
+<div class="courses-section">
+  <div class="container">
+    <div class="row g-4">
+      <div class="col-lg-4" data-aos="fade-up" data-aos-delay="0">
+        <div class="course-card" data-aos="float" style="--card-index: 0">
+          <div class="course-icon">
+            <i class="fas fa-code"></i>
+          </div>
+          <h3 class="course-title">Web Design & Development</h3>
+          <p class="course-text">
+            Master modern web technologies and frameworks. Learn HTML5, CSS3,
+            JavaScript, and popular frameworks to create responsive and dynamic
+            websites.
+          </p>
+          <ul class="course-features">
+            <li><i class="fas fa-check"></i> Frontend & Backend Development</li>
+            <li><i class="fas fa-check"></i> Responsive Design</li>
+            <li><i class="fas fa-check"></i> Modern Frameworks</li>
+          </ul>
+          <button
+            onclick="navigateToCourse('web-development')"
+            class="btn course-btn"
+          >
+            Learn More
+          </button>
+        </div>
+      </div>
+
+      <div class="col-lg-4" data-aos="fade-up" data-aos-delay="100">
+        <div class="course-card" data-aos="float" style="--card-index: 1">
+          <div class="course-icon">
+            <i class="fas fa-laptop-code"></i>
+          </div>
+          <h3 class="course-title">Software Design & Development</h3>
+          <p class="course-text">
+            Learn software engineering principles, design patterns, and best
+            practices for creating robust and scalable applications.
+          </p>
+          <ul class="course-features">
+            <li><i class="fas fa-check"></i> Object-Oriented Programming</li>
+            <li><i class="fas fa-check"></i> Software Architecture</li>
+            <li><i class="fas fa-check"></i> Agile Development</li>
+          </ul>
+          <button
+            onclick="navigateToCourse('software-development')"
+            class="btn course-btn"
+          >
+            Learn More
+          </button>
+        </div>
+      </div>
+
+      <div class="col-lg-4" data-aos="fade-up" data-aos-delay="200">
+        <div class="course-card" data-aos="float" style="--card-index: 2">
+          <div class="course-icon">
+            <i class="fas fa-database"></i>
+          </div>
+          <h3 class="course-title">Database Design & Development</h3>
+          <p class="course-text">
+            Explore database management systems, SQL, and data modeling
+            techniques for efficient data storage and retrieval.
+          </p>
+          <ul class="course-features">
+            <li><i class="fas fa-check"></i> SQL & NoSQL Databases</li>
+            <li><i class="fas fa-check"></i> Data Modeling</li>
+            <li><i class="fas fa-check"></i> Database Administration</li>
+          </ul>
+          <button
+            onclick="navigateToCourse('database-development')"
+            class="btn course-btn"
+          >
+            Learn More
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %} {% block extra_js %}
+<script>
+  function navigateToCourse(courseId) {
+    // Map the course slugs to course IDs
+    const courseMap = {
+      "web-development": "1",
+      "software-development": "2",
+      "database-development": "3",
+    };
+
+    // Get the numeric ID for the course
+    const courseNumericId = courseMap[courseId];
+
+    // Navigate to the course using the correct endpoint
+    if (courseNumericId) {
+      window.location.href = `/course/${courseNumericId}`;
+    }
+  }
+</script>
+{% endblock %}

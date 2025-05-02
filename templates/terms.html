@@ -1,0 +1,188 @@
+<!-- Feel free to change the content of this page to your liking (Jack 27/04/25)-->
+{%extends "base.html" %} {% block title %}Terms of Service{% endblock %} {%
+block content %}
+<!-- Hero Section -->
+<div class="hero-section contact-hero" data-aos="fade-up">
+  <div class="container">
+    <h1>Terms of Service</h1>
+    <p>
+      Please read the following terms and conditions carefully before using our
+      services.
+    </p>
+  </div>
+</div>
+
+<!-- Terms of Service Main Container -->
+<div class="container mb-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-10">
+      <div class="terms-card" data-aos="fade-up">
+        <!-- ToS Header -->
+        <div class="card-header">
+          <h2>
+            <i class="fas fa-file-contract me-2" aria-hidden="true"></i>Terms
+            and Conditions
+          </h2>
+          <p class="text-muted">Last updated: {{ year }}</p>
+        </div>
+
+        <!-- ToS Body -->
+        <div class="card-body">
+          <!-- Section 1: Acceptance of Terms -->
+          <section class="mb-4">
+            <h3>1. Acceptance of Terms</h3>
+            <p>
+              By accessing or using Byte.Com's website, courses, or services,
+              you agree to be bound by these Terms of Service. If you do not
+              agree to these terms, please do not use our services.
+            </p>
+          </section>
+
+          <!-- Section 2: User Accounts -->
+          <section class="mb-4">
+            <h3>2. User Accounts</h3>
+            <p>
+              When creating an account, you must provide accurate and complete
+              information. You are responsible for safeguarding your password
+              and activities under your account.
+            </p>
+          </section>
+
+          <!-- Section 3: Course Content -->
+          <section class="mb-4">
+            <h3>3. Course Content</h3>
+            <p>
+              All course materials (videos, texts, graphics, code examples) are
+              owned by Byte.Com and protected by copyright laws.
+            </p>
+            <p>
+              Access is granted for personal, non-commercial use only.
+              Redistribution, modification, or resale is strictly prohibited.
+            </p>
+          </section>
+
+          <!-- Section 4: User Conduct -->
+          <section class="mb-4">
+            <h3>4. User Conduct</h3>
+            <p>You agree not to use our services to:</p>
+            <ul>
+              <li>Violate laws or regulations</li>
+              <li>Infringe on others' rights</li>
+              <li>Share account credentials</li>
+              <li>Access restricted areas without authorization</li>
+              <li>Upload malware or viruses</li>
+              <li>Overload or disrupt systems</li>
+            </ul>
+          </section>
+
+          <!-- Section 5: Payment and Refunds -->
+          <section class="mb-4">
+            <h3>5. Payment and Refunds</h3>
+            <p>
+              Payment is required before accessing paid courses. A 30-day
+              money-back guarantee applies unless refund abuse is detected.
+            </p>
+          </section>
+
+          <!-- Section 6: Limitation of Liability -->
+          <section class="mb-4">
+            <h3>6. Limitation of Liability</h3>
+            <p>
+              Byte.Com is not responsible for any indirect, incidental, special,
+              consequential, or punitive damages arising from the use of our
+              services.
+            </p>
+          </section>
+
+          <!-- Section 7: Termination -->
+          <section class="mb-4">
+            <h3>7. Termination</h3>
+            <p>
+              We may terminate or suspend your account without prior notice if
+              you violate these Terms of Service or harm other users, Byte.Com,
+              or third parties.
+            </p>
+          </section>
+
+          <!-- Section 8: Changes to Terms -->
+          <section class="mb-4">
+            <h3>8. Changes to Terms</h3>
+            <p>
+              We may update these terms at any time. Changes will be announced
+              by updating the "Last Updated" date.
+            </p>
+          </section>
+
+          <!-- Section 9: Contact Information -->
+          <section>
+            <h3>9. Contact Information</h3>
+            <p>
+              If you have any questions about these Terms of Service, please
+              <a href="{{ url_for('contact') }}">contact us</a>.
+            </p>
+          </section>
+        </div>
+        <!-- End of ToS Body -->
+      </div>
+      <!-- End of ToS Card -->
+    </div>
+  </div>
+</div>
+{% endblock %} {% block extra_css %}
+<style>
+  /* 
+    ─────────────────────────────
+    Custom Styles for Terms Page
+    ─────────────────────────────
+  */
+  .terms-card {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 5px 30px rgba(0, 0, 0, 0.1);
+    margin-top: -50px;
+    position: relative;
+    overflow: hidden;
+    border-top: 5px solid var(--primary-color);
+  }
+
+  .terms-card .card-header {
+    padding: 2rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  }
+
+  .terms-card .card-header h2 {
+    color: var(--primary-color);
+    margin-bottom: 0.5rem;
+  }
+
+  .terms-card .card-body {
+    padding: 2rem;
+  }
+
+  .terms-card h3 {
+    color: var(--dark);
+    margin-bottom: 1rem;
+    font-weight: 600;
+  }
+
+  .terms-card ul {
+    padding-left: 1.5rem;
+    list-style: disc;
+  }
+
+  .terms-card ul li {
+    margin-bottom: 0.5rem;
+  }
+
+  /* Responsive Adjustments */
+  @media (max-width: 768px) {
+    .terms-card {
+      margin-top: 0;
+    }
+    .terms-card .card-header,
+    .terms-card .card-body {
+      padding: 1.5rem;
+    }
+  }
+</style>
+{% endblock %}

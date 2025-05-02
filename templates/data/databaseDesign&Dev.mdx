@@ -1,0 +1,352 @@
+---
+title: "Database Design & Development"
+description: "Master the principles and practices of designing, implementing, and optimizing databases for modern applications."
+instructor: "Emily Chen"
+duration: "10 weeks"
+level: "Intermediate"
+prerequisites:
+  - "Basic understanding of data structures"
+  - "Some programming experience"
+---
+
+# Sections
+
+## Overview
+
+- title: "Course Overview"
+- id: "overview"
+
+### Pages
+
+#### Course Information
+
+- id: "overview-1"
+- content: |
+  # Database Design & Development
+  This course provides a comprehensive introduction to database systems, covering both theoretical concepts and practical implementation. You'll learn how to design, build, and optimize databases for various applications.
+  ## What You'll Learn
+  - **Database Fundamentals**: Core concepts and terminology
+  - **Data Modeling**: Entity-relationship diagrams and schema design
+  - **SQL**: Advanced querying and database manipulation
+  - **Database Administration**: Performance tuning and maintenance
+
+#### Learning Path
+
+- id: "overview-2"
+- content: |
+  # Your Learning Path
+  This course is structured to build your database skills progressively:
+  1. **Database Fundamentals**
+     - Database types and architecture
+     - ACID properties
+     - Transaction management
+  2. **Data Modeling**
+     - Entity-Relationship modeling
+     - Normalization techniques
+     - Schema design best practices
+  3. **SQL & Implementation**
+     - Advanced SQL queries
+     - Stored procedures and triggers
+     - Indexing strategies
+  4. **Performance & Management**
+     - Query optimization
+     - Database maintenance
+     - Scaling strategies
+
+## Database Fundamentals
+
+- title: "Database Fundamentals"
+- id: "fundamentals"
+
+### Pages
+
+#### Introduction to Databases
+
+- id: "fund-1"
+- content: |
+  # Introduction to Databases
+  Understand the core concepts and terminology in database systems.
+  ## Key Concepts
+  - Database Management Systems (DBMS)
+  - Relational vs Non-relational databases
+  - Data independence and abstraction
+  - Schema and instance
+  ## Types of Databases
+  - Relational databases (MySQL, PostgreSQL)
+  - NoSQL databases (MongoDB, Cassandra)
+  - Object-oriented databases
+  - Graph databases (Neo4j)
+
+#### Database Architecture
+
+- id: "fund-2"
+- content: |
+  # Database Architecture
+  Learn about the internal organization and components of database systems.
+  ## Architecture Components
+  - Storage manager
+  - Query processor
+  - Transaction manager
+  - Recovery manager
+  ## Client-Server Architecture
+  Understand how databases operate in distributed environments and interact with applications.
+
+#### Transactions & ACID
+
+- id: "fund-3"
+- content: |
+  # Transactions & ACID Properties
+  Master the principles that ensure database reliability and consistency.
+  ## ACID Properties
+  - Atomicity: All-or-nothing operations
+  - Consistency: Valid state transitions
+  - Isolation: Concurrent transaction independence
+  - Durability: Permanent effects
+  ## Transaction Management
+  Learn how databases handle concurrent operations and maintain data integrity.
+
+## Data Modeling
+
+- title: "Data Modeling"
+- id: "modeling"
+
+### Pages
+
+#### Entity-Relationship Modeling
+
+- id: "model-1"
+- content: |
+  # Entity-Relationship Modeling
+  Design conceptual models that represent your data requirements.
+  ## ER Components
+  - Entities and attributes
+  - Relationships and cardinality
+  - Weak entities
+  - Identifying relationships
+  ## Creating ER Diagrams
+  Learn how to translate business requirements into effective ER diagrams using standard notation.
+
+#### Normalization
+
+- id: "model-2"
+- content: |
+  # Database Normalization
+  Organize database tables to minimize redundancy and dependency.
+  ## Normal Forms
+  - First Normal Form (1NF)
+  - Second Normal Form (2NF)
+  - Third Normal Form (3NF)
+  - Boyce-Codd Normal Form (BCNF)
+  ## Denormalization
+  Understand when breaking normalization rules can improve performance.
+
+#### Schema Design
+
+- id: "model-3"
+- content: |
+  # Schema Design
+  Translate conceptual models into physical database schemas.
+  ## Design Process
+  - Converting ER diagrams to tables
+  - Primary and foreign key selection
+  - Index planning
+  - Physical storage considerations
+  ## Schema Refinement
+  Optimize your schema design based on expected query patterns and performance requirements.
+
+## SQL & Implementation
+
+- title: "SQL & Implementation"
+- id: "sql"
+
+### Pages
+
+#### SQL Fundamentals
+
+- id: "sql-1"
+- content: |
+  # SQL Fundamentals
+  Master the language for querying and manipulating relational databases.
+  ## Core SQL
+  - SELECT, INSERT, UPDATE, DELETE statements
+  - WHERE clauses and operators
+  - JOINs (INNER, LEFT, RIGHT, FULL)
+  - GROUP BY and aggregate functions
+  ## Data Definition Language (DDL)
+  Create and modify database objects with CREATE, ALTER, and DROP statements.
+
+#### Advanced SQL
+
+- id: "sql-2"
+- content: |
+  # Advanced SQL
+  Take your SQL skills to the next level with complex queries and functions.
+  ## Advanced Techniques
+  - Subqueries and Common Table Expressions (CTEs)
+  - Window functions
+  - CASE expressions
+  - Recursive queries
+  ## SQL Example
+  ```sql
+  -- Example of a complex query with CTE and window functions
+  WITH OrderTotals AS (
+    SELECT
+      customer_id,
+      order_id,
+      order_date,
+      total_amount
+    FROM orders
+    WHERE order_date > '2023-01-01'
+  )
+  SELECT
+    customer_id,
+    order_id,
+    total_amount,
+    SUM(total_amount) OVER (PARTITION BY customer_id) as customer_total,
+    RANK() OVER (ORDER BY total_amount DESC) as order_rank
+  FROM OrderTotals;
+  ```
+
+#### Stored Procedures & Triggers
+
+- id: "sql-3"
+- content: |
+  # Stored Procedures & Triggers
+  Implement business logic directly in your database.
+  ## Stored Procedures
+  - Creating and calling procedures
+  - Parameters and return values
+  - Error handling
+  - Transaction management
+  ## Triggers
+  Automate responses to database events like INSERT, UPDATE, or DELETE operations.
+
+## Performance & Optimization
+
+- title: "Performance & Optimization"
+- id: "performance"
+
+### Pages
+
+#### Indexing
+
+- id: "perf-1"
+- content: |
+  # Database Indexing
+  Optimize query performance with effective indexing strategies.
+  ## Index Types
+  - B-tree indexes
+  - Hash indexes
+  - Full-text indexes
+  - Spatial indexes
+  ## Indexing Best Practices
+  Learn when to create indexes, which columns to index, and how to avoid common indexing pitfalls.
+
+#### Query Optimization
+
+- id: "perf-2"
+- content: |
+  # Query Optimization
+  Improve the speed and efficiency of your database queries.
+  ## Optimization Techniques
+  - Query execution plans
+  - JOIN optimization
+  - WHERE clause optimization
+  - Avoiding table scans
+  ## Performance Analysis
+  Use EXPLAIN statements and profiling tools to identify and resolve query bottlenecks.
+
+#### Database Maintenance
+
+- id: "perf-3"
+- content: |
+  # Database Maintenance
+  Keep your database running smoothly with regular maintenance.
+  ## Maintenance Tasks
+  - Backup and recovery
+  - Statistics updates
+  - Index rebuilding
+  - Consistency checks
+  ## Automation
+  Set up automated maintenance jobs and monitoring to ensure database health.
+
+## NoSQL Databases
+
+- title: "NoSQL Databases"
+- id: "nosql"
+
+### Pages
+
+#### NoSQL Introduction
+
+- id: "nosql-1"
+- content: |
+  # Introduction to NoSQL
+  Understand non-relational database technologies and their use cases.
+  ## NoSQL Categories
+  - Document stores (MongoDB)
+  - Key-value stores (Redis)
+  - Column-family stores (Cassandra)
+  - Graph databases (Neo4j)
+  ## CAP Theorem
+  Learn about the trade-offs between Consistency, Availability, and Partition tolerance in distributed databases.
+
+#### MongoDB Essentials
+
+- id: "nosql-2"
+- content: |
+  # MongoDB Essentials
+  Get started with the popular document-oriented NoSQL database.
+  ## MongoDB Concepts
+  - Documents and collections
+  - BSON data format
+  - MongoDB query language
+  - Aggregation pipeline
+  ## Example Query
+  ```javascript
+  // MongoDB query example
+  db.customers
+    .find({ status: "active", age: { $gt: 25 } }, { name: 1, email: 1, _id: 0 })
+    .sort({ name: 1 })
+    .limit(10);
+  ```
+
+## Final Project
+
+- title: "Final Project"
+- id: "project"
+
+### Pages
+
+#### Project Requirements
+
+- id: "project-1"
+- content: |
+  # Final Database Project
+  Apply your knowledge to design and implement a complete database solution.
+  ## Project Requirements
+  - Analyze business requirements
+  - Create a comprehensive data model
+  - Implement the database schema
+  - Write complex queries and stored procedures
+  - Optimize for performance
+  - Document your design decisions
+  ## Deliverables
+  Complete database implementation with documentation, SQL scripts, and performance analysis.
+
+#### Project Resources
+
+- id: "project-2"
+- content: |
+  # Project Resources
+  Tools and references to help with your database project.
+  ## Modeling Tools
+  - MySQL Workbench
+  - PostgreSQL pgAdmin
+  - ERDPlus
+  - Lucidchart
+  ## Reference Materials
+  - SQL syntax references
+  - Normalization guidelines
+  - Performance tuning checklists
+  - Sample schemas and queries

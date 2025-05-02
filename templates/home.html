@@ -1,0 +1,127 @@
+<!-- Feel free to change the content of this page to your liking (Jack 27/04/25)-->
+{% extends "base.html" %} {% block title %}Home{% endblock %} {% block content
+%}
+<!-- Hero Section -->
+<div class="hero-section text-center py-5">
+  <div class="hero-content">
+    <h1 class="display-4 fade-in text-white" data-aos="fade-up">
+      Welcome to Byte.Com
+    </h1>
+    <p class="lead slide-up text-white" data-aos="fade-up" data-aos-delay="200">
+      Empowering students with cutting-edge technology education
+    </p>
+    <div class="hero-buttons slide-up" data-aos="fade-up" data-aos-delay="400">
+      <a href="{{ url_for('courses') }}" class="btn btn-primary btn-lg me-3">
+        Explore Courses
+      </a>
+      <a href="{{ url_for('contact') }}" class="btn btn-outline-light btn-lg">
+        Contact Us
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- Features Section -->
+<div class="features-section mt-5">
+  <div class="row g-4">
+    <!-- Feature 1 -->
+    <div class="col-md-4" data-aos="fade-right">
+      <div class="feature-card" style="--card-index: 0">
+        <div class="feature-icon">
+          <i class="fas fa-graduation-cap"></i>
+        </div>
+        <h5 class="feature-title">Innovative Programs</h5>
+        <p class="feature-text">
+          Our Byte-sized courses offer cutting-edge insights into Computer
+          Science, Software Engineering, and Web Design.
+        </p>
+      </div>
+    </div>
+
+    <!-- Feature 2 -->
+    <div class="col-md-4" data-aos="fade-up">
+      <div class="feature-card" style="--card-index: 1">
+        <div class="feature-icon">
+          <i class="fas fa-chalkboard-teacher"></i>
+        </div>
+        <h5 class="feature-title">Expert Instructors</h5>
+        <p class="feature-text">
+          Learn from industry professionals dedicated to helping you succeed in
+          tech careers.
+        </p>
+      </div>
+    </div>
+
+    <!-- Feature 3 -->
+    <div class="col-md-4" data-aos="fade-left">
+      <div class="feature-card" style="--card-index: 2">
+        <div class="feature-icon">
+          <i class="fas fa-laptop"></i>
+        </div>
+        <h5 class="feature-title">Flexible Learning</h5>
+        <p class="feature-text">
+          Access course materials anytime, anywhere, and learn at your own pace
+          with our flexible programs.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- News Section -->
+<div class="news-section mt-5">
+  <h2 class="section-title text-center mb-4" data-aos="fade-up">Latest News</h2>
+  <div class="row g-4">
+    <!-- News Card 1 -->
+    <div class="col-md-6" data-aos="fade-up" data-aos-delay="100">
+      <div class="news-card slide-in-left">
+        <div class="news-content">
+          <div class="news-tag">New</div>
+          <h5 class="news-title">Exciting Course Launches</h5>
+          <p class="news-text">
+            Discover our newly launched programs designed to keep you ahead in
+            today's tech-driven world.
+          </p>
+          <div class="news-meta">
+            <span><i class="far fa-calendar"></i> March 15, 2024</span>
+            <a href="#" class="btn btn-link">
+              Read More <i class="fas fa-arrow-right"></i>
+            </a>
+            <!-- TODO: Link to detailed news article -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- News Card 2 -->
+    <div class="col-md-6" data-aos="fade-up" data-aos-delay="200">
+      <div class="news-card slide-in-right">
+        <div class="news-content">
+          <div class="news-tag">Featured</div>
+          <h5 class="news-title">Upcoming Webinars</h5>
+          <p class="news-text">
+            Join our free webinars hosted by top tech leaders sharing valuable
+            insights and career advice.
+          </p>
+          <div class="news-meta">
+            <span><i class="far fa-calendar"></i> March 10, 2024</span>
+            <a href="#" class="btn btn-link">
+              Read More <i class="fas fa-arrow-right"></i>
+            </a>
+            <!-- TODO: Link to webinar registration page -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block extra_js %}
+<!-- Initialize AOS (Animate On Scroll) -->
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+  AOS.init({
+    duration: 1000, // Animation duration
+    once: true, // Only animate once when scrolling down
+  });
+</script>
+{% endblock %}

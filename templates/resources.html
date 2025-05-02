@@ -1,0 +1,157 @@
+{# Changes made by Jack - 27/04/2025 - Added helpful comments to explain each
+section - Improved consistency of AOS animations - Cleaned up redundant
+attributes and organized structure - Added watermark and description at top #}
+{% extends "base.html" %} {% block title %} Resources - Learning Platform {%
+endblock %} {% block content %}
+<!-- Hero Section -->
+<div class="hero-section contact-hero" data-aos="fade-up">
+  <div class="container">
+    <h1>Learning Resources</h1>
+    <p>
+      Access a comprehensive collection of educational materials, tools, and
+      community resources to support your learning journey.
+    </p>
+  </div>
+</div>
+
+<!-- Main Content Container -->
+<div class="container py-5">
+  <!-- Learning Materials Section -->
+  <section class="mb-5">
+    <h2 class="h3 mb-4" data-aos="fade-up">
+      <i class="fas fa-book-reader me-2"></i>Learning Materials
+    </h2>
+
+    <div class="row g-4">
+      <!-- E-Books Card -->
+      <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="0">
+        <div class="course-card" style="--card-index: 0">
+          <div class="course-icon">
+            <i class="fas fa-file-pdf"></i>
+          </div>
+          <h3 class="course-title">E-Books Library</h3>
+          <p class="course-text">
+            Access our curated collection of programming and technology e-books,
+            from beginner guides to advanced topics.
+          </p>
+          <ul class="course-features">
+            <li><i class="fas fa-check"></i> Programming fundamentals</li>
+            <li><i class="fas fa-check"></i> Web development guides</li>
+            <li><i class="fas fa-check"></i> Software architecture</li>
+          </ul>
+          <button class="btn course-btn">Browse E-Books</button>
+        </div>
+      </div>
+
+      <!-- Video Tutorials Card -->
+      <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="100">
+        <div class="course-card" style="--card-index: 1">
+          <div class="course-icon">
+            <i class="fas fa-video"></i>
+          </div>
+          <h3 class="course-title">Video Tutorials</h3>
+          <p class="course-text">
+            Watch comprehensive video tutorials covering various programming
+            concepts and practical implementations.
+          </p>
+          <ul class="course-features">
+            <li><i class="fas fa-check"></i> Step-by-step guides</li>
+            <li><i class="fas fa-check"></i> Project walkthroughs</li>
+            <li><i class="fas fa-check"></i> Best practices</li>
+          </ul>
+          <button class="btn course-btn">Watch Videos</button>
+        </div>
+      </div>
+
+      <!-- Code Examples Card -->
+      <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="200">
+        <div class="course-card" style="--card-index: 2">
+          <div class="course-icon">
+            <i class="fas fa-code"></i>
+          </div>
+          <h3 class="course-title">Code Examples</h3>
+          <p class="course-text">
+            Explore real-world code examples and sample projects to enhance your
+            practical understanding.
+          </p>
+          <ul class="course-features">
+            <li><i class="fas fa-check"></i> Practical examples</li>
+            <li><i class="fas fa-check"></i> Sample projects</li>
+            <li><i class="fas fa-check"></i> Best practices</li>
+          </ul>
+          <button class="btn course-btn">View Examples</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Community Resources Section -->
+  <section>
+    <h2 class="h3 mb-4" data-aos="fade-up">
+      <i class="fas fa-users me-2"></i>Community Resources
+    </h2>
+
+    <div class="row g-4">
+      <!-- Discussion Forum Card -->
+      <div class="col-md-4" data-aos="fade-up" data-aos-delay="0">
+        <div class="course-card" style="--card-index: 0">
+          <div class="course-icon">
+            <i class="fas fa-comments"></i>
+          </div>
+          <h3 class="course-title">Discussion Forum</h3>
+          <p class="course-text">
+            Connect with fellow learners, share knowledge, and get help from our
+            vibrant community of developers.
+          </p>
+          <ul class="course-features">
+            <li><i class="fas fa-check"></i> Expert mentors</li>
+            <li><i class="fas fa-check"></i> Code reviews</li>
+            <li><i class="fas fa-check"></i> Problem solving</li>
+          </ul>
+          <button class="btn course-btn">Join Discussion</button>
+        </div>
+      </div>
+
+      <!-- Open Source Projects Card -->
+      <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
+        <div class="course-card" style="--card-index: 1">
+          <div class="course-icon">
+            <i class="fab fa-github"></i>
+          </div>
+          <h3 class="course-title">Open Source Projects</h3>
+          <p class="course-text">
+            Contribute to real-world projects, collaborate with other
+            developers, and build your portfolio.
+          </p>
+          <ul class="course-features">
+            <li><i class="fas fa-check"></i> Beginner-friendly projects</li>
+            <li><i class="fas fa-check"></i> Collaboration opportunities</li>
+            <li><i class="fas fa-check"></i> Code review support</li>
+          </ul>
+          <button class="btn course-btn">Explore Projects</button>
+        </div>
+      </div>
+
+      <!-- Learning Events Card -->
+      <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
+        <div class="course-card" style="--card-index: 2">
+          <div class="course-icon">
+            <i class="fas fa-calendar-alt"></i>
+          </div>
+          <h3 class="course-title">Learning Events</h3>
+          <p class="course-text">
+            Participate in workshops, hackathons, and webinars to enhance your
+            skills and network with peers.
+          </p>
+          <ul class="course-features">
+            <li><i class="fas fa-check"></i> Live workshops</li>
+            <li><i class="fas fa-check"></i> Coding competitions</li>
+            <li><i class="fas fa-check"></i> Tech talks</li>
+          </ul>
+          <button class="btn course-btn">View Schedule</button>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+{% endblock %}

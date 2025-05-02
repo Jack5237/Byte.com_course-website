@@ -1,0 +1,2167 @@
+{% extends "base.html" %} {% block title %}Course Viewer{% endblock %} {% block
+content %}
+<div class="course-viewer" data-aos="fade-in">
+  <!-- Sidebar Navigation -->
+  <div class="course-sidebar">
+    <div class="course-sidebar-header">
+      <i class="fas fa-book-open"></i>
+      <h3 id="courseName">Course Name</h3>
+    </div>
+    <nav class="course-nav">
+      <ul id="courseNavigation">
+        <!-- Navigation items will be populated by JavaScript -->
+      </ul>
+      <div class="back-to-courses">
+        <a href="{{ url_for('courses') }}" class="back-to-courses-btn">
+          <i class="fas fa-arrow-left"></i>
+          Back to Courses
+        </a>
+      </div>
+    </nav>
+  </div>
+
+  <!-- Main Content Area -->
+  <div class="course-content">
+    <div class="course-progress-wrapper">
+      <div class="course-overview">
+        <div class="overview-stats">
+          <div class="stat-item">
+            <i class="fas fa-clock"></i>
+            <div class="stat-details">
+              <span class="stat-label">Time Spent</span>
+              <span class="stat-value" id="timeSpent">0h 0m</span>
+            </div>
+          </div>
+          <div class="stat-item">
+            <i class="fas fa-tasks"></i>
+            <div class="stat-details">
+              <span class="stat-label">Completed</span>
+              <span class="stat-value" id="completedSections"
+                >0/0 sections</span
+              >
+            </div>
+          </div>
+          <div class="stat-item">
+            <i class="fas fa-award"></i>
+            <div class="stat-details">
+              <span class="stat-label">Achievements</span>
+              <span class="stat-value" id="achievements">0</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="progress-container">
+        <div class="progress-header">
+          <div class="progress-info">
+            <div class="progress-title">
+              <span class="progress-text">Overall Progress</span>
+              <span class="progress-percentage" id="overallProgress">0%</span>
+            </div>
+            <div class="progress-subtitle" id="currentStatus">Not started</div>
+          </div>
+          <div class="milestone-badges" id="milestoneBadges">
+            <!-- Milestone badges will be added here -->
+          </div>
+        </div>
+
+        <div class="progress-visualization">
+          <div class="progress-bar">
+            <div class="progress-fill" style="width: 0%"></div>
+            <div class="progress-markers" id="progressMarkers">
+              <!-- Section markers will be added here -->
+            </div>
+          </div>
+
+          <div class="section-timeline" id="sectionTimeline">
+            <!-- Section progress indicators will be added here -->
+          </div>
+        </div>
+      </div>
+
+      <div class="navigation-controls">
+        <button
+          class="nav-button prev"
+          id="prevButton"
+          onclick="navigateSection('prev')"
+          disabled
+        >
+          <i class="fas fa-arrow-left"></i>
+          <span>Previous</span>
+        </button>
+
+        <div class="current-section-info">
+          <div class="section-title" id="currentSection">Introduction</div>
+          <div class="section-progress">
+            <span id="sectionProgress">0/0</span> topics completed
+          </div>
+        </div>
+
+        <div class="navigation-actions">
+          <button
+            class="nav-button certificate-btn"
+            id="getCertificateBtn"
+            onclick="getCertificate()"
+            disabled
+          >
+            <i class="fas fa-award"></i>
+            <span>Get Certified</span>
+          </button>
+
+          <button
+            class="nav-button next"
+            id="nextButton"
+            onclick="navigateSection('next')"
+          >
+            <span>Next</span>
+            <i class="fas fa-arrow-right"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+    <div id="courseContent" class="content-wrapper">
+      <!-- Default welcome content -->
+      <div class="welcome-content">
+        <h1>Welcome to the Course</h1>
+        <p>Please select a section from the sidebar to begin learning.</p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block extra_js %}
+<!-- Store course data in hidden HTML elements -->
+{% if course_data and course_id %}
+<div
+  id="courseDataContainer"
+  data-course-id="{{ course_id }}"
+  style="display: none"
+>
+  <script type="application/json" id="courseJsonData">
+    {{ course_data|tojson|safe }}
+  </script>
+</div>
+{% endif %}
+
+<script>
+  // Create the course content object
+  var courseContent = {};
+
+  // Initialize data from server via HTML with debug info
+  (function () {
+    console.log("Initializing course data...");
+    var container = document.getElementById("courseDataContainer");
+    console.log("Container found:", !!container);
+
+    if (container) {
+      var courseId = container.getAttribute("data-course-id");
+      var jsonData = document.getElementById("courseJsonData");
+      console.log("Course ID:", courseId);
+      console.log("JSON Data element found:", !!jsonData);
+
+      if (courseId && jsonData) {
+        try {
+          const parsedData = JSON.parse(jsonData.textContent);
+          console.log("Data parsed successfully:", parsedData);
+          console.log("Course title:", parsedData.title);
+          console.log(
+            "Sections count:",
+            parsedData.sections ? parsedData.sections.length : 0
+          );
+          courseContent[courseId] = parsedData;
+        } catch (e) {
+          console.error("Error parsing course data:", e);
+          console.log("Raw JSON content:", jsonData.textContent);
+        }
+      }
+    } else {
+      console.log("No course data container found on page");
+    }
+  })();
+
+  // Function to create a section with collapsible content
+  function createSection(title, items, isFirst = false) {
+    const section = document.createElement("div");
+    section.className = "course-section";
+
+    const header = document.createElement("div");
+    header.className = "section-header";
+    if (!isFirst) header.classList.add("collapsed");
+
+    header.innerHTML = `
+      <span class="section-title">${title}</span>
+      <i class="fas fa-chevron-down arrow"></i>
+    `;
+
+    const content = document.createElement("div");
+    content.className = "section-content";
+    if (!isFirst) content.classList.add("collapsed");
+
+    content.innerHTML = items
+      .map(
+        (item, index) => `
+      <button
+        onclick="loadPage('${item.id}', ${index})"
+        class="nav-button${index === 0 && isFirst ? " active" : ""}"
+        data-section="${item.id}"
+        data-page="${index}"
+      >
+        ${item.title}
+      </button>
+    `
+      )
+      .join("");
+
+    header.addEventListener("click", () => {
+      header.classList.toggle("collapsed");
+      content.classList.toggle("collapsed");
+    });
+
+    section.appendChild(header);
+    section.appendChild(content);
+    return section;
+  }
+
+  // Function to update progress bar and timeline
+  function updateProgress(currentSection, pageIndex, totalPages) {
+    // Calculate percentage based on pages within subsection
+    const percentage = Math.round((pageIndex / (totalPages - 1)) * 100) || 0;
+    document.querySelector(".progress-percentage").textContent =
+      `${percentage}%`;
+    document.querySelector(".progress-fill").style.width = `${percentage}%`;
+
+    // Update timeline points
+    const timeline = document.getElementById("sectionTimeline");
+    if (!timeline) return;
+
+    timeline.innerHTML = "";
+
+    // Create timeline points for pages
+    for (let i = 0; i < totalPages; i++) {
+      const point = document.createElement("div");
+      point.className = "timeline-point";
+
+      if (i < pageIndex) {
+        point.classList.add("completed");
+      } else if (i === pageIndex) {
+        point.classList.add("current");
+      }
+
+      const label = document.createElement("span");
+      label.className = "timeline-label";
+      label.textContent = `Page ${i + 1}`;
+      point.appendChild(label);
+
+      timeline.appendChild(point);
+    }
+  }
+
+  // Function to update navigation buttons
+  function updateNavigation(currentIndex, totalSections) {
+    const prevButton = document.getElementById("prevButton");
+    const nextButton = document.getElementById("nextButton");
+
+    prevButton.disabled = currentIndex === 0;
+    nextButton.disabled = currentIndex === totalSections - 1;
+  }
+
+  // Function to navigate between sections
+  function navigateSection(direction) {
+    // Extract course ID from URL path
+    const pathParts = window.location.pathname.split("/");
+    // Look for "course" in the path
+    const courseIndex = pathParts.findIndex((part) => part === "course");
+    let courseId;
+
+    if (courseIndex !== -1 && courseIndex < pathParts.length - 1) {
+      // Get the ID that comes after "course"
+      courseId = pathParts[courseIndex + 1];
+    } else {
+      // Fallback to last part of URL
+      courseId = pathParts[pathParts.length - 1];
+    }
+
+    console.log("Navigation - course ID:", courseId);
+
+    const course = courseContent[courseId];
+    if (!course) {
+      console.warn("Cannot navigate: no course data available");
+      return;
+    }
+
+    // Get the current section and page
+    const activeButton = document.querySelector(".nav-button.active");
+    if (!activeButton) {
+      console.warn("Cannot navigate: no active button found");
+      // If no active button, try to load the first page
+      if (
+        course.sections &&
+        course.sections.length > 0 &&
+        course.sections[0].pages &&
+        course.sections[0].pages.length > 0
+      ) {
+        loadPage(course.sections[0].pages[0].id, 0);
+      }
+      return;
+    }
+
+    const currentPageId = activeButton.getAttribute("data-section");
+    console.log(
+      "Navigating from page ID:",
+      currentPageId,
+      "Direction:",
+      direction
+    );
+
+    // Find the current section and page
+    let currentSection = null;
+    let currentPage = null;
+    let currentPageIndex = -1;
+    let currentSectionIndex = -1;
+
+    for (let i = 0; i < course.sections.length; i++) {
+      const section = course.sections[i];
+      if (!section.pages) continue;
+      const pageIndex = section.pages.findIndex((p) => p.id === currentPageId);
+      if (pageIndex !== -1) {
+        currentSection = section;
+        currentPage = section.pages[pageIndex];
+        currentPageIndex = pageIndex;
+        currentSectionIndex = i;
+        break;
+      }
+    }
+
+    if (!currentSection || !currentPage) return;
+
+    // Determine the new page index
+    let newPageIndex =
+      direction === "prev" ? currentPageIndex - 1 : currentPageIndex + 1;
+
+    // If we're within the same section
+    if (newPageIndex >= 0 && newPageIndex < currentSection.pages.length) {
+      loadPage(currentSection.pages[newPageIndex].id, newPageIndex);
+      return;
+    }
+
+    // If we need to move to a different section
+    let newSectionIndex =
+      direction === "prev" ? currentSectionIndex - 1 : currentSectionIndex + 1;
+
+    if (newSectionIndex >= 0 && newSectionIndex < course.sections.length) {
+      const newSection = course.sections[newSectionIndex];
+      if (!newSection.pages || newSection.pages.length === 0) return;
+
+      const newPageIndex =
+        direction === "prev" ? newSection.pages.length - 1 : 0;
+      loadPage(newSection.pages[newPageIndex].id, newPageIndex);
+    }
+  }
+
+  // Function to load specific page content
+  function loadPage(pageId, pageIndex) {
+    // Extract course ID from URL path
+    const pathParts = window.location.pathname.split("/");
+    // Look for "course" in the path
+    const courseIndex = pathParts.findIndex((part) => part === "course");
+    let courseId;
+
+    if (courseIndex !== -1 && courseIndex < pathParts.length - 1) {
+      // Get the ID that comes after "course"
+      courseId = pathParts[courseIndex + 1];
+    } else {
+      // Fallback to last part of URL
+      courseId = pathParts[pathParts.length - 1];
+    }
+
+    console.log(
+      "Loading page:",
+      pageId,
+      "index:",
+      pageIndex,
+      "for course:",
+      courseId
+    );
+
+    const course = courseContent[courseId];
+    if (!course) {
+      console.warn("Cannot load page: no course data available");
+      return;
+    }
+
+    // Find the section that contains this page
+    let currentSection = null;
+    let currentPage = null;
+    let currentPageIndex = -1;
+
+    for (const section of course.sections) {
+      if (!section.pages) continue;
+      const pageIndex = section.pages.findIndex((p) => p.id === pageId);
+      if (pageIndex !== -1) {
+        currentSection = section;
+        currentPage = section.pages[pageIndex];
+        currentPageIndex = pageIndex;
+        console.log("Found page in section:", section.title);
+        break;
+      }
+    }
+
+    if (!currentSection || !currentPage) {
+      console.warn("Page not found in any section");
+      return;
+    }
+
+    // Update active state in navigation
+    document.querySelectorAll(".nav-button").forEach((btn) => {
+      btn.classList.remove("active");
+    });
+    document
+      .querySelector(`.nav-button[data-section="${pageId}"]`)
+      ?.classList.add("active");
+
+    const contentDiv = document.getElementById("courseContent");
+    contentDiv.style.opacity = "0";
+    contentDiv.style.transform = "translateY(20px)";
+
+    // Update section info
+    document.getElementById("currentSection").textContent =
+      currentSection.title;
+    document.getElementById("sectionProgress").textContent =
+      `${currentPageIndex + 1}/${currentSection.pages.length}`;
+
+    // Update navigation buttons
+    const prevButton = document.getElementById("prevButton");
+    const nextButton = document.getElementById("nextButton");
+    prevButton.disabled = currentPageIndex === 0;
+    nextButton.disabled = currentPageIndex === currentSection.pages.length - 1;
+
+    // Update content with animation
+    setTimeout(() => {
+      contentDiv.innerHTML = currentPage.content;
+
+      // Initialize interactive elements if needed
+      if (pageId.includes("quiz")) {
+        initializeQuiz();
+      }
+
+      // Update complete button state if page is completed
+      if (currentPage.completed) {
+        const completeButton = contentDiv.querySelector(".complete-button");
+        if (completeButton) {
+          completeButton.classList.add("completed");
+          completeButton.innerHTML = 'Completed <i class="fas fa-check"></i>';
+          completeButton.disabled = true;
+        }
+      }
+
+      contentDiv.style.opacity = "1";
+      contentDiv.style.transform = "translateY(0)";
+    }, 300);
+
+    // Update progress
+    updateOverallProgress(course);
+    updateTimeSpent();
+  }
+
+  // Function to organize content into sections
+  function organizeSections(courseId) {
+    const course = courseContent[courseId];
+    console.log("Organizing sections for course:", courseId);
+    console.log("Course data available:", !!course);
+
+    // Set a default course name first
+    document.getElementById("courseName").textContent = "Loading Course...";
+
+    // If no course data is available
+    if (!course || !course.sections || course.sections.length === 0) {
+      console.warn("No course data or sections found");
+      document.getElementById("courseName").textContent =
+        course && course.title ? course.title : "Course";
+
+      // Create a dummy section if none exist
+      if (!course || !course.sections || course.sections.length === 0) {
+        console.log("Creating fallback sections");
+        const navList = document.getElementById("courseNavigation");
+        navList.innerHTML = `
+          <div class="course-section">
+            <div class="section-header">
+              <span class="section-title">No sections available</span>
+            </div>
+          </div>
+        `;
+        return;
+      }
+    }
+
+    // Set course name from data
+    if (course && course.title) {
+      document.getElementById("courseName").textContent = course.title;
+    }
+
+    const navList = document.getElementById("courseNavigation");
+    navList.innerHTML = "";
+
+    // Create sections directly from the course data
+    let isFirst = true;
+    course.sections.forEach((section) => {
+      console.log(
+        "Creating section:",
+        section.title,
+        "with",
+        section.pages.length,
+        "pages"
+      );
+      const sectionItems = section.pages.map((page, index) => ({
+        id: page.id,
+        title: page.title,
+        content: page.content,
+      }));
+
+      navList.appendChild(createSection(section.title, sectionItems, isFirst));
+      isFirst = false;
+    });
+
+    // Initialize progress and navigation
+    updateProgress(0, 0, 0);
+    updateNavigation(0, course.sections.length);
+
+    // Load first section
+    if (course.sections.length > 0 && course.sections[0].pages.length > 0) {
+      loadPage(course.sections[0].pages[0].id, 0);
+    }
+  }
+
+  // Function to get certificate when the button is clicked
+  function getCertificate() {
+    const courseId = getPathCourseId();
+    const course = courseContent[courseId];
+
+    if (course && course.completed) {
+      showCertificate(
+        course.title || document.getElementById("courseName").textContent
+      );
+    } else {
+      // If the course is not fully completed, show an alert
+      alert(
+        "You need to complete all sections of the course to get certified!"
+      );
+    }
+  }
+
+  // Function to update overall progress
+  function updateOverallProgress(course) {
+    if (!course || !course.sections) {
+      console.warn("Cannot update progress: invalid course data");
+      return;
+    }
+
+    const totalSections = course.sections.length;
+    let completedSections = 0;
+    let totalTopics = 0;
+    let completedTopics = 0;
+
+    // Calculate progress
+    course.sections.forEach((section) => {
+      totalTopics += section.pages.length;
+      completedTopics += section.pages.filter((page) => page.completed).length;
+      if (section.completed) completedSections++;
+    });
+
+    // Update stats
+    const progress =
+      totalTopics > 0 ? Math.round((completedTopics / totalTopics) * 100) : 0;
+    document.getElementById("overallProgress").textContent = `${progress}%`;
+    document.getElementById("completedSections").textContent =
+      `${completedSections}/${totalSections} sections`;
+    document.querySelector(".progress-fill").style.width = `${progress}%`;
+
+    // Update status text
+    const status =
+      progress === 0
+        ? "Not started"
+        : progress < 25
+          ? "Just beginning"
+          : progress < 50
+            ? "Making progress"
+            : progress < 75
+              ? "Well underway"
+              : progress < 100
+                ? "Almost there"
+                : "Completed";
+    document.getElementById("currentStatus").textContent = status;
+
+    // Check if the course is completed and update "Get Certified" button state
+    const getCertificateBtn = document.getElementById("getCertificateBtn");
+    if (progress === 100) {
+      course.completed = true;
+      if (getCertificateBtn) {
+        getCertificateBtn.disabled = false;
+        getCertificateBtn.title = "Get your certificate of completion";
+      }
+
+      // Store completion in localStorage
+      const courseKey = `course_${course.id || getPathCourseId()}_completed`;
+      if (!localStorage.getItem(courseKey)) {
+        localStorage.setItem(courseKey, new Date().toISOString());
+
+        // Show certificate automatically on first completion (after a small delay)
+        setTimeout(() => {
+          showCertificate(
+            course.title || document.getElementById("courseName").textContent
+          );
+        }, 1000);
+      }
+    } else {
+      course.completed = false;
+      if (getCertificateBtn) {
+        getCertificateBtn.disabled = true;
+        getCertificateBtn.title = "Complete the course to get certified";
+      }
+    }
+
+    // Update achievements
+    updateAchievements(progress, completedSections);
+  }
+
+  // Function to get course ID from path
+  function getPathCourseId() {
+    const pathParts = window.location.pathname.split("/");
+    const courseIndex = pathParts.findIndex((part) => part === "course");
+    if (courseIndex !== -1 && courseIndex < pathParts.length - 1) {
+      return pathParts[courseIndex + 1];
+    }
+    return pathParts[pathParts.length - 1];
+  }
+
+  // Function to show certificate
+  function showCertificate(courseName) {
+    // Create certificate HTML in the main content area
+    const currentDate = new Date();
+    const options = { year: "numeric", month: "long", day: "numeric" };
+    const formattedDate = currentDate.toLocaleDateString("en-US", options);
+
+    const contentDiv = document.getElementById("courseContent");
+    contentDiv.style.opacity = "0";
+    contentDiv.style.transform = "translateY(20px)";
+
+    setTimeout(() => {
+      contentDiv.innerHTML = `
+        <div class="certificate-wrapper">
+          <div class="certificate">
+            <div class="certificate-header">
+              <i class="fas fa-award certificate-icon"></i>
+              <h2>Certificate of Completion</h2>
+            </div>
+            <div class="certificate-body">
+              <p class="congratulations">Congratulations!</p>
+              <p class="completion-text">You have successfully completed</p>
+              <h3 class="course-name">${courseName}</h3>
+              <p class="date-completed">Completed on ${formattedDate}</p>
+              <div class="certificate-seal">
+                <i class="fas fa-certificate"></i>
+              </div>
+            </div>
+            <div class="certificate-footer">
+              <button class="btn btn-primary print-btn" onclick="window.print()">
+                <i class="fas fa-print me-2"></i>Print Certificate
+              </button>
+              <button class="btn btn-secondary" onclick="returnToCourse()">
+                <i class="fas fa-arrow-left me-2"></i>Return to Course
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+
+      contentDiv.style.opacity = "1";
+      contentDiv.style.transform = "translateY(0)";
+    }, 300);
+  }
+
+  // Function to return to course content
+  function returnToCourse() {
+    // Load the first page of the first section
+    const courseId = getPathCourseId();
+    const course = courseContent[courseId];
+
+    if (
+      course &&
+      course.sections &&
+      course.sections.length > 0 &&
+      course.sections[0].pages &&
+      course.sections[0].pages.length > 0
+    ) {
+      loadPage(course.sections[0].pages[0].id, 0);
+    }
+  }
+
+  function updateAchievements(progress, completedSections) {
+    const badges = [];
+    if (progress >= 25)
+      badges.push({ icon: "fa-star", title: "Getting Started" });
+    if (progress >= 50)
+      badges.push({ icon: "fa-medal", title: "Halfway There" });
+    if (progress >= 75)
+      badges.push({ icon: "fa-trophy", title: "Almost Complete" });
+    if (progress === 100)
+      badges.push({ icon: "fa-crown", title: "Course Master" });
+
+    const badgesContainer = document.getElementById("milestoneBadges");
+    badgesContainer.innerHTML = badges
+      .map(
+        (badge) => `
+      <div class="milestone-badge" title="${badge.title}">
+        <i class="fas ${badge.icon}"></i>
+      </div>
+    `
+      )
+      .join("");
+
+    document.getElementById("achievements").textContent = badges.length;
+  }
+
+  function updateTimeSpent() {
+    const startTime = localStorage.getItem("courseStartTime") || Date.now();
+    const timeSpent = Math.floor((Date.now() - startTime) / 1000 / 60); // in minutes
+    const hours = Math.floor(timeSpent / 60);
+    const minutes = timeSpent % 60;
+    document.getElementById("timeSpent").textContent = `${hours}h ${minutes}m`;
+  }
+
+  // Function to mark a page as complete
+  function markPageComplete(sectionId, pageId) {
+    // Extract course ID from URL path
+    const courseId = getPathCourseId();
+    const course = courseContent[courseId];
+    if (!course) return;
+
+    // Find the section and page
+    let section = course.sections.find((s) => s.id === sectionId);
+    if (!section) return;
+
+    let page = section.pages.find((p) => p.id === pageId);
+    if (!page) return;
+
+    // Mark the page as complete
+    page.completed = true;
+
+    // Check if all pages in the section are complete
+    section.completed = section.pages.every((p) => p.completed);
+
+    // Check if ALL pages in ALL sections are complete
+    const allCompleted = course.sections.every(
+      (s) => s.pages && s.pages.length > 0 && s.pages.every((p) => p.completed)
+    );
+
+    if (allCompleted) {
+      console.log("All pages in all sections are completed!");
+      course.completed = true;
+    }
+
+    // Update progress
+    updateOverallProgress(course);
+
+    // Update the complete button
+    const button = document.querySelector(
+      `button[onclick="markPageComplete('${sectionId}', '${pageId}')"]`
+    );
+    if (button) {
+      button.classList.add("completed");
+      button.innerHTML = 'Completed <i class="fas fa-check"></i>';
+      button.disabled = true;
+    }
+
+    // Save progress to localStorage
+    saveProgress(courseId);
+  }
+
+  // Function to save progress
+  function saveProgress(courseId) {
+    const progress = {
+      courseId,
+      sections: courseContent[courseId].sections.map((section) => ({
+        id: section.id,
+        completed: section.completed,
+        pages: section.pages.map((page) => ({
+          id: page.id,
+          completed: page.completed,
+        })),
+      })),
+    };
+    localStorage.setItem("courseProgress", JSON.stringify(progress));
+  }
+
+  // Function to load progress
+  function loadProgress(courseId) {
+    const savedProgress = localStorage.getItem("courseProgress");
+    if (savedProgress) {
+      const progress = JSON.parse(savedProgress);
+      if (progress.courseId === courseId) {
+        progress.sections.forEach((savedSection) => {
+          const section = courseContent[courseId].sections.find(
+            (s) => s.id === savedSection.id
+          );
+          if (section) {
+            section.completed = savedSection.completed;
+            savedSection.pages.forEach((savedPage) => {
+              const page = section.pages.find((p) => p.id === savedPage.id);
+              if (page) {
+                page.completed = savedPage.completed;
+              }
+            });
+          }
+        });
+      }
+    }
+  }
+
+  // Add function for quiz navigation
+  function initializeQuiz() {
+    const quizContainer = document.getElementById("htmlQuiz");
+    if (!quizContainer) return;
+
+    const questions = quizContainer.querySelectorAll(".quiz-question");
+    const prevBtn = quizContainer.querySelector(".quiz-prev-btn");
+    const nextBtn = quizContainer.querySelector(".quiz-next-btn");
+    const submitBtn = quizContainer.querySelector(".quiz-submit-btn");
+    const totalQuestions = questions.length;
+    const progressBar = quizContainer.querySelector(".quiz-progress-bar");
+
+    let currentQuestion = 1;
+
+    // Update quiz progress
+    function updateProgress() {
+      quizContainer.querySelector(".current-question").textContent =
+        currentQuestion;
+      quizContainer.querySelector(".total-questions").textContent =
+        totalQuestions;
+      progressBar.style.width = `${(currentQuestion / totalQuestions) * 100}%`;
+
+      // Enable/disable navigation buttons
+      prevBtn.disabled = currentQuestion === 1;
+      nextBtn.disabled = currentQuestion === totalQuestions;
+
+      // Show submit button on last question
+      if (currentQuestion === totalQuestions) {
+        nextBtn.style.display = "none";
+        submitBtn.style.display = "block";
+      } else {
+        nextBtn.style.display = "block";
+        submitBtn.style.display = "none";
+      }
+    }
+
+    // Navigate to previous question
+    prevBtn.addEventListener("click", () => {
+      if (currentQuestion > 1) {
+        questions.forEach((q) => q.classList.remove("active"));
+        currentQuestion--;
+        questions[currentQuestion - 1].classList.add("active");
+        updateProgress();
+      }
+    });
+
+    // Navigate to next question
+    nextBtn.addEventListener("click", () => {
+      if (currentQuestion < totalQuestions) {
+        questions.forEach((q) => q.classList.remove("active"));
+        currentQuestion++;
+        questions[currentQuestion - 1].classList.add("active");
+        updateProgress();
+      }
+    });
+
+    // Show quiz results
+    submitBtn.addEventListener("click", () => {
+      // Calculate score
+      let correctAnswers = 0;
+      questions.forEach((q) => {
+        const selectedOption = q.querySelector("input:checked");
+        if (
+          selectedOption &&
+          selectedOption.parentNode.getAttribute("data-correct") === "true"
+        ) {
+          correctAnswers++;
+        }
+      });
+
+      // Update results
+      const score = Math.round((correctAnswers / totalQuestions) * 100);
+      quizContainer.querySelector(".score-value").textContent = `${score}%`;
+      quizContainer.querySelector(".correct-answers").textContent =
+        correctAnswers;
+
+      // Hide questions, show results
+      quizContainer.querySelector(".quiz-questions").style.display = "none";
+      quizContainer.querySelector(".quiz-navigation").style.display = "none";
+      quizContainer.querySelector(".quiz-results").style.display = "block";
+    });
+
+    // Reset and restart quiz
+    quizContainer
+      .querySelector(".quiz-retry-btn")
+      .addEventListener("click", () => {
+        currentQuestion = 1;
+        questions.forEach((q) => {
+          q.classList.remove("active");
+          q.querySelectorAll("input").forEach(
+            (input) => (input.checked = false)
+          );
+        });
+        questions[0].classList.add("active");
+        quizContainer.querySelector(".quiz-questions").style.display = "block";
+        quizContainer.querySelector(".quiz-navigation").style.display = "flex";
+        quizContainer.querySelector(".quiz-results").style.display = "none";
+        updateProgress();
+      });
+
+    // Initialize quiz
+    updateProgress();
+  }
+
+  // Function to initialize certificate button when page loads
+  function initializeCertificateButton() {
+    const courseId = getPathCourseId();
+    const courseKey = `course_${courseId}_completed`;
+    const getCertificateBtn = document.getElementById("getCertificateBtn");
+
+    if (!getCertificateBtn) return;
+
+    // Check if course was previously completed
+    if (localStorage.getItem(courseKey)) {
+      getCertificateBtn.disabled = false;
+      getCertificateBtn.title = "Get your certificate of completion";
+
+      // Also mark the course as completed in the courseContent object
+      if (courseContent[courseId]) {
+        courseContent[courseId].completed = true;
+      }
+    } else {
+      getCertificateBtn.disabled = true;
+      getCertificateBtn.title = "Complete the course to get certified";
+    }
+  }
+
+  // Initialize course content
+  window.onload = function () {
+    console.log("Window loaded, initializing course content...");
+
+    // First try to get course data from the HTML container
+    var container = document.getElementById("courseDataContainer");
+    var urlCourseId = "";
+
+    if (container) {
+      urlCourseId = container.getAttribute("data-course-id");
+      console.log("Course ID from HTML:", urlCourseId);
+    }
+
+    // If not found, try extracting from URL path as fallback
+    if (!urlCourseId) {
+      const pathParts = window.location.pathname.split("/");
+      // Look for "course" in the path
+      const courseIndex = pathParts.findIndex((part) => part === "course");
+      if (courseIndex !== -1 && courseIndex < pathParts.length - 1) {
+        // Get the ID that comes after "course"
+        urlCourseId = pathParts[courseIndex + 1];
+      } else {
+        // Fallback to last part of URL
+        urlCourseId = pathParts[pathParts.length - 1];
+      }
+      console.log("Course ID from URL path:", urlCourseId);
+    }
+
+    console.log("Available course content keys:", Object.keys(courseContent));
+
+    if (urlCourseId) {
+      if (!localStorage.getItem("courseStartTime")) {
+        localStorage.setItem("courseStartTime", Date.now());
+      }
+
+      // If course data not available, try to fetch it
+      if (!courseContent[urlCourseId]) {
+        console.log(
+          "No course data found for ID:",
+          urlCourseId,
+          "- trying to fetch it"
+        );
+        // Redirect to course viewer with proper ID if needed
+        if (window.location.pathname.indexOf("/course/") === -1) {
+          window.location.href = "/course/" + urlCourseId;
+          return;
+        } else {
+          // Create placeholder while waiting for data
+          courseContent[urlCourseId] = {
+            title: "Loading Course " + urlCourseId + "...",
+            sections: [],
+          };
+        }
+      }
+
+      // Initialize course with the course ID
+      loadProgress(urlCourseId);
+      organizeSections(urlCourseId);
+
+      // Update page title with course name
+      if (courseContent[urlCourseId] && courseContent[urlCourseId].title) {
+        document.title = courseContent[urlCourseId].title + " | Course Viewer";
+      }
+
+      setInterval(updateTimeSpent, 60000);
+
+      // Initialize certificate button
+      setTimeout(initializeCertificateButton, 1000);
+    } else {
+      console.log("No course ID found");
+      // Show placeholder content
+      document.getElementById("courseName").textContent = "Course Viewer";
+    }
+  };
+
+  // Function to reset course completion status (for testing)
+  function resetCourseCompletion() {
+    const courseId = getPathCourseId();
+    const courseKey = `course_${courseId}_completed`;
+    localStorage.removeItem(courseKey);
+    console.log("Course completion status has been reset for testing");
+  }
+
+  // Function to manually test certificate (for development only)
+  function testCertificate() {
+    // Get course title from document
+    const courseTitle = document.getElementById("courseName").textContent;
+    showCertificate(courseTitle);
+  }
+
+  // Add this to window object for debugging
+  window.testCertificate = testCertificate;
+  window.resetCourseCompletion = resetCourseCompletion;
+</script>
+
+<style>
+  .course-progress-wrapper {
+    background: linear-gradient(
+      165deg,
+      var(--primary-color),
+      var(--secondary-color)
+    );
+    padding: 2rem;
+    color: white;
+    border-radius: 0 20px 0 0;
+  }
+
+  .course-overview {
+    margin-bottom: 2rem;
+  }
+
+  .overview-stats {
+    display: flex;
+    gap: 2rem;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+  }
+
+  .stat-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 1rem;
+    border-radius: 12px;
+    flex: 1;
+  }
+
+  .stat-item i {
+    font-size: 1.5rem;
+    color: rgba(255, 255, 255, 0.9);
+  }
+
+  .stat-details {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .stat-label {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  .stat-value {
+    font-size: 1.1rem;
+    font-weight: 600;
+  }
+
+  .progress-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1.5rem;
+  }
+
+  .progress-title {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+  }
+
+  .progress-text {
+    font-size: 1.2rem;
+    font-weight: 600;
+  }
+
+  .progress-percentage {
+    font-size: 2rem;
+    font-weight: 700;
+  }
+
+  .progress-subtitle {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.9rem;
+    margin-top: 0.25rem;
+  }
+
+  .milestone-badges {
+    display: flex;
+    gap: 1rem;
+  }
+
+  .milestone-badge {
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+  }
+
+  .milestone-badge:hover {
+    transform: scale(1.1);
+    background: rgba(255, 255, 255, 0.2);
+  }
+
+  .milestone-badge i {
+    font-size: 1.2rem;
+    color: rgba(255, 255, 255, 0.9);
+  }
+
+  .progress-visualization {
+    margin-bottom: 2rem;
+  }
+
+  .progress-bar {
+    height: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    position: relative;
+    margin-bottom: 1rem;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 4px;
+    transition: width 0.5s ease;
+  }
+
+  .progress-markers {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 2px;
+  }
+
+  .section-timeline {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 0.5rem;
+  }
+
+  .timeline-point {
+    width: 12px;
+    height: 12px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    position: relative;
+    cursor: pointer;
+  }
+
+  .timeline-point.completed {
+    background: rgba(255, 255, 255, 0.9);
+  }
+
+  .timeline-point.current {
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.2);
+  }
+
+  .timeline-label {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.7);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+
+  .timeline-point:hover .timeline-label {
+    opacity: 1;
+  }
+
+  .navigation-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .navigation-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .nav-button {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1.5rem;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    color: white;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    cursor: pointer;
+  }
+
+  .nav-button.certificate-btn {
+    background: rgba(74, 222, 128, 0.2);
+    border-color: rgba(74, 222, 128, 0.4);
+  }
+
+  .nav-button.certificate-btn:hover:not(:disabled) {
+    background: rgba(74, 222, 128, 0.3);
+  }
+
+  .nav-button.certificate-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  .nav-button:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+  }
+
+  .nav-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .current-section-info {
+    text-align: center;
+  }
+
+  .section-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+  }
+
+  .section-progress {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  .complete-section {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    text-align: right;
+  }
+
+  .complete-button {
+    padding: 0.75rem 1.5rem;
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .complete-button:hover:not(:disabled) {
+    background: var(--secondary-color);
+    transform: translateY(-2px);
+  }
+
+  .complete-button.completed {
+    background: #28a745;
+    cursor: default;
+  }
+
+  .complete-button:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+
+  .complete-button i {
+    font-size: 0.9rem;
+  }
+
+  .interactive-example {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin: 2rem 0;
+  }
+
+  .code-playground {
+    background: #2d2d2d;
+    color: #fff;
+    padding: 1rem;
+    border-radius: 6px;
+    font-family: monospace;
+    margin-top: 1rem;
+  }
+
+  .demo-container {
+    background: white;
+    padding: 1rem;
+    border-radius: 6px;
+    border: 1px solid #dee2e6;
+    margin-top: 1rem;
+  }
+
+  .framework-comparison {
+    margin: 2rem 0;
+  }
+
+  .comparison-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1rem;
+  }
+
+  .comparison-item {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .comparison-item i {
+    font-size: 2rem;
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+  }
+
+  .code-example {
+    background: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin: 2rem 0;
+  }
+
+  .code-example pre {
+    background: #2d2d2d;
+    color: #fff;
+    padding: 1rem;
+    border-radius: 6px;
+    overflow-x: auto;
+  }
+
+  .architecture-diagram {
+    margin: 2rem 0;
+    text-align: center;
+  }
+
+  .api-example {
+    background: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin: 2rem 0;
+  }
+
+  .api-example pre {
+    background: #2d2d2d;
+    color: #fff;
+    padding: 1rem;
+    border-radius: 6px;
+    font-family: monospace;
+  }
+
+  /* Course Overview Styles */
+  .course-overview-banner {
+    background: linear-gradient(
+      to right,
+      var(--primary-color-light),
+      var(--secondary-color-light)
+    );
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .course-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+  }
+
+  .meta-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--dark);
+  }
+
+  .meta-item i {
+    color: var(--primary-color);
+  }
+
+  .learning-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+  }
+
+  .learning-item {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 1.5rem;
+    text-align: center;
+    transition: all 0.3s ease;
+    border: 1px solid #e9ecef;
+  }
+
+  .learning-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+  }
+
+  .learning-item i {
+    font-size: 2rem;
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+  }
+
+  /* Learning Path Styles */
+  .learning-path {
+    margin-top: 2rem;
+  }
+
+  .path-item {
+    display: flex;
+    margin-bottom: 2rem;
+  }
+
+  .path-number {
+    width: 40px;
+    height: 40px;
+    background: var(--primary-color);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    margin-right: 1.5rem;
+    flex-shrink: 0;
+  }
+
+  .path-content {
+    position: relative;
+  }
+
+  .path-content:before {
+    content: "";
+    position: absolute;
+    left: -30px;
+    top: 40px;
+    height: calc(100% + 20px);
+    width: 2px;
+    background: #e9ecef;
+    z-index: -1;
+  }
+
+  .path-item:last-child .path-content:before {
+    display: none;
+  }
+
+  .path-topics {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+  }
+
+  .path-topics span {
+    background: #e9ecef;
+    padding: 0.35rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
+  }
+
+  /* Resources Styles */
+  .resources-container {
+    margin-top: 2rem;
+  }
+
+  .resource-category {
+    margin-bottom: 2.5rem;
+  }
+
+  .resource-category h2 {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    border-bottom: 1px solid #e9ecef;
+    padding-bottom: 0.75rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .resource-category h2 i {
+    color: var(--primary-color);
+  }
+
+  .resource-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .resource-item {
+    display: flex;
+    background: #f8f9fa;
+    border-radius: 10px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    border: 1px solid #e9ecef;
+  }
+
+  .resource-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+  }
+
+  .resource-icon {
+    width: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.75rem;
+  }
+
+  .resource-icon.pdf {
+    background: #f44336;
+    color: white;
+  }
+
+  .resource-icon.video {
+    background: #4caf50;
+    color: white;
+  }
+
+  .resource-icon.article {
+    background: #2196f3;
+    color: white;
+  }
+
+  .resource-icon.exercise {
+    background: #ff9800;
+    color: white;
+  }
+
+  .resource-details {
+    padding: 1rem;
+    flex-grow: 1;
+  }
+
+  .resource-details h4 {
+    margin-bottom: 0.5rem;
+  }
+
+  .resource-details p {
+    margin-bottom: 0.75rem;
+    font-size: 0.9rem;
+    color: #6c757d;
+  }
+
+  .resource-link {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 500;
+    display: inline-block;
+  }
+
+  .resource-link:hover {
+    text-decoration: underline;
+  }
+
+  /* Quiz Styles */
+  .quiz-container {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+    margin: 2rem 0;
+  }
+
+  .quiz-progress {
+    background: #f8f9fa;
+    padding: 1rem;
+    position: relative;
+  }
+
+  .quiz-progress-bar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 4px;
+    background: var(--primary-color);
+    transition: width 0.3s ease;
+    width: 20%;
+  }
+
+  .quiz-progress-text {
+    text-align: center;
+    font-weight: 500;
+  }
+
+  .quiz-questions {
+    padding: 2rem;
+  }
+
+  .quiz-question {
+    display: none;
+  }
+
+  .quiz-question.active {
+    display: block;
+  }
+
+  .quiz-options {
+    margin-top: 1.5rem;
+  }
+
+  .quiz-option {
+    background: #f8f9fa;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .quiz-option:hover {
+    background: #e9ecef;
+  }
+
+  .quiz-option input {
+    margin-right: 0.75rem;
+  }
+
+  .quiz-navigation {
+    display: flex;
+    justify-content: space-between;
+    padding: 1.5rem 2rem;
+    border-top: 1px solid #e9ecef;
+  }
+
+  .quiz-navigation button {
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .quiz-prev-btn,
+  .quiz-next-btn {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    color: #495057;
+  }
+
+  .quiz-prev-btn:hover,
+  .quiz-next-btn:hover {
+    background: #e9ecef;
+  }
+
+  .quiz-submit-btn,
+  .quiz-retry-btn {
+    background: var(--primary-color);
+    border: none;
+    color: white;
+  }
+
+  .quiz-submit-btn:hover,
+  .quiz-retry-btn:hover {
+    background: var(--primary-color-dark);
+  }
+
+  .quiz-results {
+    padding: 2rem;
+    text-align: center;
+  }
+
+  .quiz-score {
+    margin: 2rem 0;
+  }
+
+  .score-circle {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    background: #f8f9fa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    border: 6px solid var(--primary-color);
+  }
+
+  .score-value {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--primary-color);
+  }
+
+  /* Project Styles */
+  .project-container {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+    margin: 2rem 0;
+  }
+
+  .project-header {
+    background: linear-gradient(
+      to right,
+      var(--primary-color),
+      var(--secondary-color)
+    );
+    color: white;
+    padding: 2rem;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+  }
+
+  .project-info {
+    max-width: 600px;
+  }
+
+  .project-tag {
+    display: inline-block;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 0.35rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    margin-bottom: 1rem;
+  }
+
+  .project-meta {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.75rem;
+  }
+
+  .project-meta .meta-item {
+    color: white;
+  }
+
+  .project-meta .meta-item i {
+    color: rgba(255, 255, 255, 0.8);
+  }
+
+  .project-content {
+    padding: 2rem;
+  }
+
+  .requirement-list {
+    margin-bottom: 2rem;
+  }
+
+  .requirement-list li {
+    margin-bottom: 0.75rem;
+    position: relative;
+    padding-left: 1.5rem;
+  }
+
+  .requirement-list li:before {
+    content: "✓";
+    position: absolute;
+    left: 0;
+    color: var(--primary-color);
+  }
+
+  .project-resources {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #e9ecef;
+  }
+
+  .project-resources .resource-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+
+  .project-resources .resource-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: #f8f9fa;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+  }
+
+  .project-resources .resource-link:hover {
+    background: #e9ecef;
+    text-decoration: none;
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .course-meta,
+    .learning-grid,
+    .resource-list {
+      grid-template-columns: 1fr;
+    }
+
+    .project-header {
+      flex-direction: column;
+    }
+  }
+
+  /* Certificate Styles */
+  .certificate-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem 0;
+  }
+
+  .certificate {
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    border: 10px solid #4361ee;
+    border-radius: 15px;
+    padding: 20px;
+    position: relative;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+    max-width: 800px;
+    width: 100%;
+    margin: 0 auto;
+  }
+
+  .certificate:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%234361ee' fill-opacity='0.05' fill-rule='evenodd'/%3E%3C/svg%3E");
+    z-index: -1;
+  }
+
+  .certificate-header {
+    text-align: center;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #4361ee;
+    margin-bottom: 20px;
+  }
+
+  .certificate-icon {
+    font-size: 3rem;
+    color: #4361ee;
+    margin-bottom: 10px;
+  }
+
+  .certificate-header h2 {
+    font-family: "Righteous", cursive;
+    font-size: 2.5rem;
+    color: #3a0ca3;
+    margin: 0;
+  }
+
+  .certificate-body {
+    text-align: center;
+    padding: 30px 0;
+  }
+
+  .congratulations {
+    font-family: "Righteous", cursive;
+    font-size: 2rem;
+    font-weight: bold;
+    color: #4361ee;
+    margin-bottom: 5px;
+  }
+
+  .completion-text {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+  }
+
+  .course-name {
+    font-family: "Righteous", cursive;
+    font-size: 2.2rem;
+    color: #3a0ca3;
+    margin: 15px 0;
+    padding: 10px 20px;
+    border: 2px dashed #4361ee;
+    display: inline-block;
+  }
+
+  .date-completed {
+    font-size: 1.1rem;
+    font-style: italic;
+    margin-top: 20px;
+  }
+
+  .certificate-seal {
+    position: absolute;
+    bottom: 70px;
+    right: 40px;
+    font-size: 5rem;
+    color: #4361ee;
+    opacity: 0.5;
+    transform: rotate(-15deg);
+  }
+
+  .certificate-footer {
+    text-align: center;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 2px solid #4361ee;
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+  }
+
+  .certificate-footer button {
+    padding: 10px 20px;
+    transition: all 0.3s ease;
+  }
+
+  /* Print styles */
+  @media print {
+    body * {
+      visibility: hidden;
+    }
+    .certificate-wrapper,
+    .certificate-wrapper * {
+      visibility: visible;
+    }
+    .certificate-wrapper {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      padding: 0;
+    }
+    .certificate {
+      border: 10px solid #4361ee !important;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+    .certificate-footer {
+      display: none;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .certificate {
+      padding: 15px;
+      border-width: 7px;
+    }
+
+    .certificate-header h2 {
+      font-size: 2rem;
+    }
+
+    .congratulations {
+      font-size: 1.5rem;
+    }
+
+    .course-name {
+      font-size: 1.8rem;
+      padding: 8px 15px;
+    }
+
+    .certificate-seal {
+      font-size: 4rem;
+      bottom: 50px;
+      right: 30px;
+    }
+  }
+
+  @media (max-width: 576px) {
+    .certificate {
+      padding: 10px;
+      border-width: 5px;
+    }
+
+    .certificate-icon {
+      font-size: 2.5rem;
+    }
+
+    .certificate-header h2 {
+      font-size: 1.7rem;
+    }
+
+    .congratulations {
+      font-size: 1.3rem;
+    }
+
+    .completion-text {
+      font-size: 1rem;
+    }
+
+    .course-name {
+      font-size: 1.5rem;
+      padding: 5px 10px;
+    }
+
+    .certificate-seal {
+      font-size: 3rem;
+      bottom: 40px;
+      right: 20px;
+    }
+
+    .certificate-footer {
+      flex-direction: column;
+    }
+
+    .certificate-footer button {
+      width: 100%;
+    }
+  }
+
+  /* Enhanced mobile responsiveness */
+  @media (max-width: 768px) {
+    .course-viewer {
+      flex-direction: column;
+    }
+
+    .course-sidebar {
+      width: 100%;
+      max-width: none;
+      border-radius: 0;
+    }
+
+    .course-content {
+      width: 100%;
+      border-radius: 0;
+    }
+
+    .overview-stats {
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .stat-item {
+      width: 100%;
+    }
+
+    .progress-header {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .milestone-badges {
+      margin-top: 1rem;
+      align-self: center;
+      width: 100%;
+      justify-content: center;
+    }
+
+    .navigation-controls {
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .navigation-actions {
+      width: 100%;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .navigation-actions button {
+      width: 100%;
+    }
+
+    .current-section-info {
+      width: 100%;
+      order: -1;
+      margin-bottom: 1rem;
+    }
+
+    .nav-button {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+
+  @media (max-width: 576px) {
+    .course-progress-wrapper {
+      padding: 1rem;
+      border-radius: 0;
+    }
+
+    .progress-percentage {
+      font-size: 1.5rem;
+    }
+
+    .progress-text {
+      font-size: 1rem;
+    }
+
+    .section-title {
+      font-size: 1rem;
+    }
+
+    .section-progress {
+      font-size: 0.8rem;
+    }
+
+    .back-to-courses-btn {
+      width: 100%;
+      text-align: center;
+      padding: 0.75rem;
+    }
+
+    .content-wrapper {
+      padding: 1rem;
+    }
+  }
+</style>
+{% endblock %}
