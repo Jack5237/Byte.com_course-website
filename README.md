@@ -17,6 +17,7 @@
 - **Contact Information**: Easy access to department contact details
 - **Responsive Design**: Works seamlessly across all devices
 - **AOS Animations**: Smooth scroll animations for better user experience
+* **Interactive Course Viewer**: Browse and explore courses dynamically with a user-friendly interface
 
 * **Easily Editable Course Maker**: Anyone can create or update courses by editing the `.mdx` files located in the `templates/data` directory – no coding knowledge required
 
