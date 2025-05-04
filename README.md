@@ -4,6 +4,7 @@
 ![Flask](https://img.shields.io/badge/Flask-2.0+-green)
 ![Python](https://img.shields.io/badge/Python-3.8+-blue)
 ![License](https://img.shields.io/badge/License-MIT-yellow)
+[![Live Preview](https://img.shields.io/badge/Live%20Preview-Click%20Here-brightgreen)](https://byte-com-course-website.onrender.com)
 
 > **Byte.Com** is a modern, responsive web application designed for educational institutions, built with Flask. It offers a comprehensive platform for showcasing academic programs, faculty information, and institutional highlights. The entire website is easily customizable—allowing you to modify content, design, and structure to fully match your institution's unique needs.
 >
@@ -20,6 +21,11 @@
 * **Interactive Course Viewer**: Browse and explore courses dynamically with a user-friendly interface
 
 * **Easily Editable Course Maker**: Anyone can create or update courses by editing the `.mdx` files located in the `templates/data` directory – no coding knowledge required
+
+>
+> 🟢 **[Live Preview](https://byte-com-course-website.onrender.com)**  
+>
+
 
 ## 🚀 Getting Started
 
