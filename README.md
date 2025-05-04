@@ -22,13 +22,10 @@
 
 * **Easily Editable Course Maker**: Anyone can create or update courses by editing the `.mdx` files located in the `templates/data` directory – no coding knowledge required
 
+## 🚀 Getting Started
 >
 > 🟢 **[Live Preview](https://byte-com-course-website.onrender.com)**  
 >
-
-
-## 🚀 Getting Started
-
 ### Prerequisites
 
 - Python 3.8 or higher
