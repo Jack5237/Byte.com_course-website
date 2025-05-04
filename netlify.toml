@@ -1,16 +1,1 @@
-[build]
-  command = "pip install -r requirements.txt"
-  publish = "."
-  functions = "netlify/functions"
 
-[build.environment]
-  PYTHON_VERSION = "3.9"
-
-[[redirects]]
-  from = "/*"
-  to = "/.netlify/functions/flask_app"
-  status = 200
-
-[functions]
-  node_bundler = "esbuild"
-  external_node_modules = ["flask"] 
